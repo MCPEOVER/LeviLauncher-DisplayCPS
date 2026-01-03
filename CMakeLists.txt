@@ -100,5 +100,6 @@ target_link_libraries(
     EGL
     GLESv3
     GLESv2
+    c++_shared
     ${ANDROID_CXX_LIB}
 )
