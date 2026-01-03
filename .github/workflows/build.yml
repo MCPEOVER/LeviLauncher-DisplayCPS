@@ -19,7 +19,7 @@ jobs:
       - name: Install CMake
         uses: lukka/get-cmake@v3.30.0
 
-      - name: Setup Android NDK
+      - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
       - name: Install NDK r25c
@@ -36,7 +36,8 @@ jobs:
             -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake \
             -DANDROID_ABI=arm64-v8a \
             -DANDROID_PLATFORM=android-21 \
-            -DANDROID_STL=c++_shared
+            -DANDROID_STL=c++_shared \
+            -DCMAKE_ANDROID_STL_TYPE=c++_shared
 
       - name: Build
         run: |
