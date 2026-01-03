@@ -11,6 +11,7 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--gc-sections,--
 
 include(FetchContent)
 
+# fmt 라이브러리
 FetchContent_Declare(
     fmt
     GIT_REPOSITORY https://github.com/fmtlib/fmt.git
@@ -18,6 +19,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(fmt)
 
+# preloader_android 라이브러리
 FetchContent_Declare(
     preloader_android
     GIT_REPOSITORY https://github.com/LiteLDev/preloader-android.git
@@ -26,24 +28,31 @@ FetchContent_Declare(
 FetchContent_GetProperties(preloader_android)
 if(NOT preloader_android_POPULATED)
     FetchContent_Populate(preloader_android)
-    
+
+    # Logger.h fmt 수정
     file(READ "${preloader_android_SOURCE_DIR}/src/pl/Logger.h" LOGGER_CONTENT)
     string(REPLACE "#include <format>" "#include <fmt/format.h>" LOGGER_CONTENT "${LOGGER_CONTENT}")
     string(REPLACE "std::vformat" "fmt::vformat" LOGGER_CONTENT "${LOGGER_CONTENT}")
     string(REPLACE "std::make_format_args" "fmt::make_format_args" LOGGER_CONTENT "${LOGGER_CONTENT}")
     file(WRITE "${preloader_android_SOURCE_DIR}/src/pl/Logger.h" "${LOGGER_CONTENT}")
-    
+
     add_subdirectory(${preloader_android_SOURCE_DIR} ${preloader_android_BINARY_DIR})
 endif()
 
-target_link_libraries(preloader PUBLIC fmt::fmt)
+# libc++_shared 찾기
+find_library(ANDROID_CXX_LIB c++_shared)
 
+# preloader 링크
+target_link_libraries(preloader PUBLIC fmt::fmt ${ANDROID_CXX_LIB})
+
+# include 경로
 include_directories(
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/ImGui
     ${CMAKE_SOURCE_DIR}/src/ImGui/backends
 )
 
+# 소스 파일
 set(SOURCES
     src/main.cpp
     src/ImGui/imgui.cpp
@@ -54,5 +63,16 @@ set(SOURCES
     src/ImGui/backends/imgui_impl_android.cpp
 )
 
+# DisplayCPS 라이브러리 생성
 add_library(DisplayCPS SHARED ${SOURCES})
-target_link_libraries(DisplayCPS preloader log android EGL GLESv3 GLESv2)
+
+# DisplayCPS 링크
+target_link_libraries(DisplayCPS
+    preloader
+    log
+    android
+    EGL
+    GLESv3
+    GLESv2
+    ${ANDROID_CXX_LIB}
+)
