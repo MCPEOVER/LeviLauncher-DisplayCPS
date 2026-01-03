@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 project(DisplayCPS LANGUAGES C CXX)
+# CMakeLists.txt 파일 상단에 추가
+add_definitions(-D_LIBCPP_ENABLE_ASSERTIONS=0)
 
 # -------------------------------------------------
 # 기본 설정
