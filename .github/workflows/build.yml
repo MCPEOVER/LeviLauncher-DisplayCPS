@@ -19,7 +19,7 @@ jobs:
       - name: Install CMake
         uses: lukka/get-cmake@v3.30.0
 
-      - name: Setup Android SDK
+      - name: Setup Android
         uses: android-actions/setup-android@v3
 
       - name: Install NDK r25c
@@ -27,7 +27,7 @@ jobs:
           sdkmanager "ndk;25.2.9519653"
           echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/25.2.9519653" >> $GITHUB_ENV
 
-      - name: Configure CMake
+      - name: Configure (CMake)
         run: |
           mkdir build
           cd build
@@ -37,7 +37,9 @@ jobs:
             -DANDROID_ABI=arm64-v8a \
             -DANDROID_PLATFORM=android-21 \
             -DANDROID_STL=c++_shared \
-            -DCMAKE_ANDROID_STL_TYPE=c++_shared
+            -DPL_BUILD_GLOSSHOOK=ON \
+            -DPL_USE_PREBUILT_GLOSSHOOK=OFF \
+            -DPL_USE_LIBCXX=ON
 
       - name: Build
         run: |
